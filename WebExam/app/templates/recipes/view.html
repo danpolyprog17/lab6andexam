@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}{{ recipe.title }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center">
+  <h1>{{ recipe.title }}</h1>
+  <div>
+    {% if can_modify %}
+      <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('recipes.edit', recipe_id=recipe.id) }}">Редактировать</a>
+      <form method="post" action="{{ url_for('recipes.delete', recipe_id=recipe.id) }}" class="d-inline" onsubmit="return confirm('Вы уверены, что хотите удалить рецепт {{ recipe.title }}?');">
+        <button type="submit" class="btn btn-sm btn-outline-danger">Удалить</button>
+      </form>
+    {% endif %}
+  </div>
+</div>
+
+<p class="text-muted">Время: {{ recipe.cook_time_min }} мин | Порции: {{ recipe.servings }} | Средняя оценка: {{ '%.1f' % avg_rating }} ({{ reviews_count }})</p>
+
+{% if recipe.images %}
+<div class="row g-2">
+  {% for img in recipe.images %}
+  <div class="col-6 col-md-3">
+    <img class="img-fluid rounded" src="{{ url_for('recipes.uploaded_file', filename=img.filename) }}" alt="image">
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<hr>
+<h4>Описание</h4>
+<div class="markdown-body">{{ recipe.description_md | markdown | safe }}</div>
+
+<h4 class="mt-3">Ингредиенты</h4>
+<div class="markdown-body">{{ recipe.ingredients_md | markdown | safe }}</div>
+
+<h4 class="mt-3">Шаги приготовления</h4>
+<div class="markdown-body">{{ recipe.steps_md | markdown | safe }}</div>
+
+<hr>
+<div class="d-flex justify-content-between align-items-center">
+  <h3>Отзывы</h3>
+  {% if current_user.is_authenticated %}
+    {% if existing_user_review %}
+      <span class="text-muted">Вы уже оставили отзыв ниже</span>
+    {% else %}
+      <a class="btn btn-sm btn-primary" href="{{ url_for('reviews.create', recipe_id=recipe.id) }}">Написать отзыв</a>
+    {% endif %}
+  {% endif %}
+</div>
+
+<div class="list-group mt-2">
+  {% for rv in recipe.reviews %}
+  <div class="list-group-item">
+    <div class="d-flex w-100 justify-content-between">
+      <strong>{{ rv.user.full_name() }}</strong>
+      <small class="text-muted">{{ rv.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+    </div>
+    <div>Оценка: {{ rv.rating }}</div>
+    <div class="markdown-body">{{ rv.text_md | markdown | safe }}</div>
+  </div>
+  {% else %}
+  <div class="alert alert-info">Пока нет отзывов</div>
+  {% endfor %}
+</div>
+{% endblock %}

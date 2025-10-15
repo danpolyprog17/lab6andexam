@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}{% if mode == 'create' %}Добавить рецепт{% else %}Редактировать рецепт{% endif %}{% endblock %}
+{% block content %}
+<h1>{% if mode == 'create' %}Добавить рецепт{% else %}Редактировать рецепт{% endif %}</h1>
+<form method="post" enctype="multipart/form-data">
+  <div class="mb-3">
+    <label class="form-label">Название</label>
+    <input type="text" name="title" class="form-control" value="{{ recipe.title if recipe else '' }}" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Описание</label>
+    <textarea name="description_md" class="form-control" rows="6">{{ recipe.description_md if recipe else '' }}</textarea>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Ингредиенты</label>
+    <textarea name="ingredients_md" class="form-control" rows="6">{{ recipe.ingredients_md if recipe else '' }}</textarea>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Шаги приготовления</label>
+    <textarea name="steps_md" class="form-control" rows="8">{{ recipe.steps_md if recipe else '' }}</textarea>
+  </div>
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <label class="form-label">Время приготовления (мин)</label>
+      <input type="number" name="cook_time_min" class="form-control" min="0" value="{{ recipe.cook_time_min if recipe else 0 }}" required>
+    </div>
+    <div class="col-md-6 mb-3">
+      <label class="form-label">Порции</label>
+      <input type="number" name="servings" class="form-control" min="0" value="{{ recipe.servings if recipe else 0 }}" required>
+    </div>
+  </div>
+  {% if mode == 'create' %}
+  <div class="mb-3">
+    <label class="form-label">Изображения</label>
+    <input type="file" name="images" class="form-control" accept="image/*" multiple>
+  </div>
+  {% endif %}
+  <button type="submit" class="btn btn-primary">Сохранить</button>
+  <a class="btn btn-secondary" href="{{ url_for('recipes.index') }}">Отмена</a>
+</form>
+
+<script>
+  const mde1 = new EasyMDE({ element: document.querySelector('textarea[name="description_md"]') });
+  const mde2 = new EasyMDE({ element: document.querySelector('textarea[name="ingredients_md"]') });
+  const mde3 = new EasyMDE({ element: document.querySelector('textarea[name="steps_md"]') });
+</script>
+{% endblock %}

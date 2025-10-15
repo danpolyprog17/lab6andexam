@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="title-area position-relative" style="background-image: url({{ course.bg_image.url if course.bg_image else url_for('static', filename='images/default-course-bg.jpg') }});">
+    <div class="h-100 w-100 py-5 d-flex text-center position-absolute" style="background-color: rgba(0, 0, 0, 0.65);">
+        <div class="m-auto">
+            <h1 class="title mb-3 font-weight-bold">{{ course.name }}</h1>
+            <p class="mb-3 mx-auto">
+                {{ course.category.name if course.category else 'Без категории' }} | <span>★</span> <span>{{ "%.2f" | format(course.rating) }}</span>
+            </p>
+            <div class="container">
+                <p class="description w-75 mb-5 mx-auto">
+                    {{ course.short_desc }}
+                </p>
+            </div>
+        {% if current_user.is_authenticated %}
+            <a href="#" class="btn btn-outline-light btn-lg">Перейти к материалам курса</a>
+        {% else %}
+            <button class="btn btn-outline-light btn-lg" disabled>Записаться</button>
+        {% endif %}
+        
+        <div class="mt-3">
+            <a href="{{ url_for('courses.reviews', course_id=course.id) }}" class="btn btn-primary btn-lg">Все отзывы</a>
+        </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <section class="about mb-5">
+        <h2 class="mb-3 text-center text-uppercase font-weight-bold">О курсе</h2>
+        <p>{{ course.full_desc }}</p>
+    </section>
+
+    <section class="program mb-5">
+        <h2 class="mb-3 text-center text-uppercase font-weight-bold">Программа курса</h2>
+        
+        <div class="text-center">
+            <p class="text-muted">Программа курса будет добавлена в будущих версиях.</p>
+        </div>
+    </section>
+
+    <!-- Секция с последними отзывами -->
+    <section class="reviews mb-5">
+        <h2 class="mb-3 text-center text-uppercase font-weight-bold">Последние отзывы</h2>
+        
+        {% if recent_reviews %}
+            {% for review in recent_reviews %}
+                <div class="card mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ review.user.full_name if review.user else 'Неизвестный пользователь' }}</strong>
+                            <small class="text-muted ml-2">{{ review.created_at.strftime('%d.%m.%Y %H:%M') }}</small>
+                        </div>
+                        <div class="rating">
+                            {% for i in range(5) %}
+                                {% if i < review.rating %}
+                                    <span class="text-warning">★</span>
+                                {% else %}
+                                    <span class="text-muted">☆</span>
+                                {% endif %}
+                            {% endfor %}
+                            <span class="ml-2">{{ review.rating }}/5</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">{{ review.text }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-center text-muted">Пока нет отзывов к этому курсу.</p>
+        {% endif %}
+    </section>
+
+    <!-- Форма создания отзыва -->
+    {% if current_user.is_authenticated %}
+        <section class="create-review mb-5">
+            <h2 class="mb-3 text-center text-uppercase font-weight-bold">Оставить отзыв</h2>
+            
+            {% if user_review %}
+                <div class="card">
+                    <div class="card-header">
+                        <strong>Ваш отзыв</strong>
+                        <small class="text-muted ml-2">{{ user_review.created_at.strftime('%d.%m.%Y %H:%M') }}</small>
+                    </div>
+                    <div class="card-body">
+                        <div class="rating mb-2">
+                            {% for i in range(5) %}
+                                {% if i < user_review.rating %}
+                                    <span class="text-warning">★</span>
+                                {% else %}
+                                    <span class="text-muted">☆</span>
+                                {% endif %}
+                            {% endfor %}
+                            <span class="ml-2">{{ user_review.rating }}/5</span>
+                        </div>
+                        <p class="card-text">{{ user_review.text }}</p>
+                    </div>
+                </div>
+            {% else %}
+                <form method="POST" action="{{ url_for('courses.create_review', course_id=course.id) }}">
+                    <div class="form-group mb-3">
+                        <label for="rating">Оценка:</label>
+                        <select class="form-control" id="rating" name="rating" required>
+                            <option value="5" selected>5 — отлично</option>
+                            <option value="4">4 — хорошо</option>
+                            <option value="3">3 — удовлетворительно</option>
+                            <option value="2">2 — неудовлетворительно</option>
+                            <option value="1">1 — плохо</option>
+                            <option value="0">0 — ужасно</option>
+                        </select>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="text">Текст отзыва:</label>
+                        <textarea class="form-control" id="text" name="text" rows="4" required 
+                                  placeholder="Опишите ваши впечатления от курса..."></textarea>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-success btn-lg">Отправить отзыв</button>
+                    </div>
+                </form>
+            {% endif %}
+        </section>
+    {% endif %}
+</div>
+
+{% endblock %}
