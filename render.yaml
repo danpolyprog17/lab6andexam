@@ -4,16 +4,22 @@ services:
     rootDir: lab6
     env: python
     plan: free
-    buildCommand: pip install -r requirements.txt
+    buildCommand: pip install -U pip setuptools wheel && pip install -r requirements.txt
     startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
     autoDeploy: true
+    envVars:
+      - key: SECRET_KEY
+        value: change-me-lab6
 
   - type: web
     name: webexam
     rootDir: WebExam
     env: python
     plan: free
-    buildCommand: pip install -r requirements.txt
+    buildCommand: pip install -U pip setuptools wheel && pip install -r requirements.txt
     startCommand: gunicorn wsgi:app --bind 0.0.0.0:$PORT
     autoDeploy: true
+    envVars:
+      - key: SECRET_KEY
+        value: change-me-webexam
 
