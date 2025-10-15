@@ -14,7 +14,7 @@ MarkupSafe==2.1.5
 mysql-connector-python==8.4.0
 python-dotenv==1.0.1
 SQLAlchemy==2.0.30
-typing-extensions==4.11.0
+typing-extensions>=4.12.2
 werkzeug==3.0.3
 zipp==3.18.1
 pytest==7.4.0
